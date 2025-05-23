@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Asisten AI Peribadi (by: A.H 5.1)</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" id="hljs-theme">
+  <style>
+    /* FONT POPPINS */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+    /* TEMA GELAP (default) */
+    :root {
+      --bg-color: #0d1117;
+      --text-color: #c9d1d9;
+      --primary-color: #58a6ff;
+      --secondary-color: #1f8bff; /* Untuk butang sekunder */
+      --accent-color: #8b949e;
+      --input-bg: #161b22;
+      --input-border: #30363d;
+      --button-primary-bg: #238636;
+      --button-primary-hover: #2ea043;
+      --button-secondary-bg: #30363d; /* Butang sekunder/tindakan */
+      --button-secondary-hover: #484f58;
+      --button-tertiary-bg: #8250df; /* Butang lain */
+      --button-tertiary-hover: #a6397b;
+      --button-danger-bg: #da3633;
+      --button-danger-hover: #f04542;
+      --loading-spinner-color: var(--primary-color);
+      --response-bg: #161b22;
+      --history-bg: #0d1117; /* Updated for main container bg */
+      --history-border: #30363d;
+      --error-text: #f8d7da;
+      --error-bg: #721c24;
+      --error-border: #f5c6cb;
+      --text-muted-color: #6e7781;
+      --link-color: #58a6ff;
+      --code-bg: #161b22;
+      --code-text: var(--text-color);
+      --pre-bg: var(--code-bg);
+      --pre-border: #3e4451;
+      --blockquote-border: #30363d;
+      --modal-bg: #161b22; /* Modal background */
+      --modal-overlay-bg: rgba(0,0,0,0.6);
+      --hljs-theme-link: "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css";
+    }
+
+    /* TEMA TERANG */
+    .light-theme {
+      --bg-color: #f6f8fa;
+      --text-color: #24292f;
+      --primary-color: #0969da;
+      --secondary-color: #57606a; /* Untuk butang sekunder */
+      --accent-color: #6e7781;
+      --input-bg: #fff;
+      --input-border: #d0d7de;
+      --button-primary-bg: #238636;
+      --button-primary-hover: #2ea043;
+      --button-secondary-bg: #f6f8fa; /* Butang sekunder/tindakan */
+      --button-secondary-hover: #eef1f4;
+      --button-tertiary-bg: #8250df; /* Butang lain */
+      --button-tertiary-hover: #a6397b;
+      --button-danger-bg: #da3633;
+      --button-danger-hover: #f04542;
+      --loading-spinner-color: var(--primary-color);
+      --response-bg: #fff;
+      --history-bg: #f6f8fa; /* Updated for main container bg */
+      --history-border: #d0d7de;
+      --error-text: #721c24;
+      --error-bg: #f8d7da;
+      --error-border: #f5c6cb;
+      --text-muted-color: #6e7781;
+      --link-color: #0969da;
+      --code-bg: #f6f8fa;
+      --code-text: var(--text-color);
+      --pre-bg: var(--code-bg);
+      --pre-border: #d0d7de;
+      --blockquote-border: #d0d7de;
+      --modal-bg: #ffffff; /* Modal background for light theme */
+      --modal-overlay-bg: rgba(50,50,50,0.5);
+      --hljs-theme-link: "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css";
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 900px;
+      padding: 30px;
+      background-color: var(--history-bg);
+      border-radius: 12px; /* Slightly more rounded */
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1); /* Softer shadow */
+      transition: background-color 0.3s;
+      border: 1px solid var(--history-border);
+    }
+
+    h1 {
+      color: var(--primary-color);
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 2em; /* Slightly larger title */
+    }
+
+    .header-controls {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        display: flex;
+        gap: 10px;
+        z-index: 1000;
+    }
+
+    .header-controls button {
+        background-color: var(--button-tertiary-bg);
+        color: #fff;
+        border: none;
+        border-radius: 50%; /* Circular buttons */
+        width: 40px;
+        height: 40px;
+        font-size: 1.2em;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .header-controls button:hover {
+        background-color: var(--button-tertiary-hover);
+        transform: translateY(-1px);
+    }
+    .header-controls button:active {
+        transform: translateY(0px);
+    }
+
+
+    .warning {
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 0.9em;
+      background-color: #ffeeba;
+      color: #85640c;
+      border: 1px solid #ffeb3b;
+    }
+
+    .info-box {
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        text-align: center;
+        font-size: 0.9em;
+        background-color: #e7f3ff;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+     }
+
+    /* Config section now inside modal, but we'll keep its sub-styles */
+    .config-section { margin-bottom: 0; } /* Removed top margin for modal content */
+    .config-section label { margin-bottom: 8px; }
+    .config-section textarea { margin-bottom: 0; } /* Remove margin for last element in modal */
+
+    .input-section, .response-section, .history-section {
+        margin-bottom: 30px; /* Increased spacing between major sections */
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px; /* Increased label margin */
+        font-weight: 500;
+        color: var(--accent-color);
+    }
+
+    input[type="text"], select, textarea {
+      width: 100%;
+      padding: 12px 15px;
+      margin-bottom: 15px;
+      border: 1px solid var(--input-border);
+      border-radius: 6px;
+      background-color: var(--input-bg);
+      color: var(--text-color);
+      font-size: 1em;
+      box-sizing: border-box;
+      transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+    }
+
+    textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+     input[type="text"]:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb, 88,166,255),0.3); /* Dynamic focus color */
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    #clearInputBtn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: none;
+        color: var(--accent-color);
+        cursor: pointer;
+        font-size: 1.2em;
+        padding: 5px;
+        display: none;
+    }
+    #clearInputBtn:hover {
+        color: var(--primary-color);
+    }
+
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .button-group button, .button-group select {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.95em;
+      font-weight: 500;
+      transition: background-color 0.2s ease-in-out, opacity 0.2s, transform 0.1s ease;
+    }
+    .button-group button:not(:disabled):hover {
+        transform: translateY(-1px);
+    }
+    .button-group button:not(:disabled):active {
+        transform: translateY(0px);
+    }
+     .button-group button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    #submitBtn { background-color: var(--button-primary-bg); }
+    #submitBtn:hover:not(:disabled) { background-color: var(--button-primary-hover); }
+
+    #stopBtn, #stopSpeechBtn { background-color: var(--button-danger-bg); }
+    #stopBtn:hover:not(:disabled), #stopSpeechBtn:hover:not(:disabled) { background-color: var(--button-danger-hover); }
+
+    #clearHistoryBtn, #exportHistoryBtn, /*#themeToggleBtn,*/ #voiceToggleBtn, #ttsBtn {
+      background-color: var(--button-tertiary-bg);
+    }
+    #clearHistoryBtn:hover:not(:disabled), #exportHistoryBtn:hover:not(:disabled),
+    /*#themeToggleBtn:hover:not(:disabled),*/ #voiceToggleBtn:hover:not(:disabled),
+    #ttsBtn:hover:not(:disabled) {
+      background-color: var(--button-tertiary-hover);
+    }
+
+    .loading-indicator {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      margin: 20px 0;
+      color: var(--accent-color);
+      font-size: 1.1em;
+    }
+
+    .spinner {
+      border: 4px solid rgba(139, 148, 158, 0.3);
+      border-top: 4px solid var(--loading-spinner-color);
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      animation: spin 0.8s linear infinite;
+      margin-right: 12px;
+    }
+      .note {
+      font-size: 0.85rem; /* Smaller note */
+      color: var(--text-muted-color);
+      margin-top: 1.5rem;
+      text-align: center;
+    }
+     .action-button {
+         background-color: var(--button-secondary-bg) !important;
+         color: var(--text-color) !important;
+         border: 1px solid var(--input-border) !important;
+     }
+     .action-button:hover:not(:disabled) {
+        border-color: var(--primary-color) !important;
+        background-color: var(--input-bg) !important;
+     }
+
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    #responseArea, #historyArea {
+      padding: 20px;
+      background-color: var(--response-bg);
+      border-radius: 8px; /* Slightly more rounded */
+      border: 1px solid var(--input-border);
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+    #responseArea { margin-bottom: 25px; }
+
+    #responseArea h2, #historyArea h2 {
+      color: var(--primary-color);
+      margin-top: 0;
+      margin-bottom: 15px;
+      font-size: 1.3em; /* Slightly smaller section titles */
+      border-bottom: 1px solid var(--input-border);
+      padding-bottom: 10px;
+    }
+
+    #responseText {
+      white-space: normal;
+      word-wrap: break-word;
+      line-height: 1.7;
+      color: var(--text-color);
+      min-height: 50px;
+    }
+
+    #responseText pre, .ai-response pre {
+      background-color: var(--pre-bg);
+      border: 1px solid var(--pre-border);
+      border-radius: 6px;
+      padding: 15px;
+      overflow-x: auto;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.9em;
+      margin: 1em 0;
+    }
+    #responseText code:not(pre > code), .ai-response code:not(pre > code) {
+       background-color: var(--code-bg);
+       color: var(--code-text);
+       padding: 0.2em 0.4em;
+       border-radius: 3px;
+       font-size: 0.85em;
+    }
+    #responseText pre code.hljs { padding: 0; background: none; border: none; }
+    #responseText ul, #responseText ol, .ai-response ul, .ai-response ol { padding-left: 25px; }
+    #responseText blockquote, .ai-response blockquote {
+        border-left: 4px solid var(--blockquote-border);
+        padding-left: 15px; margin-left: 0;
+        color: var(--accent-color); font-style: italic;
+    }
+    #responseText table { border-collapse: collapse; margin: 1em 0; width: auto; border: 1px solid var(--input-border); }
+    #responseText th, #responseText td { border: 1px solid var(--input-border); padding: 8px 12px; text-align: left; }
+    #responseText th { background-color: var(--input-bg); font-weight: 600; }
+    #responseText a { color: var(--link-color); text-decoration: none; }
+    #responseText a:hover { text-decoration: underline; }
+
+    #historyContainer {
+      max-height: 400px;
+      overflow-y: auto;
+      color: var(--text-color);
+      line-height: 1.6;
+      padding-right: 10px;
+    }
+
+    #historyContainer::-webkit-scrollbar { width: 8px; }
+    #historyContainer::-webkit-scrollbar-track { background: var(--input-bg); border-radius: 4px; }
+    #historyContainer::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 4px; }
+    #historyContainer::-webkit-scrollbar-thumb:hover { background: var(--primary-color); }
+
+    .history-item {
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px dashed var(--input-border);
+      position: relative;
+    }
+    .history-item:last-child { border-bottom: none; }
+
+    .user-prompt { font-weight: 600; color: var(--secondary-color); margin-bottom: 8px; word-wrap: break-word; }
+    .ai-response-label { font-weight: 600; color: var(--primary-color); margin-bottom: 8px; }
+    .ai-response { white-space: normal; word-wrap: break-word; padding-top: 0; }
+    .user-content { word-wrap: break-word; }
+
+    .copy-button-wrapper { position: absolute; top: 0px; right: 0; z-index: 10; }
+    .copy-button-wrapper button.action-button {
+      /* Style already handled by .action-button */
+      border-radius: 5px; padding: 4px 8px;
+      font-size: 0.75em; cursor: pointer; opacity: 0.8; transition: all 0.2s;
+    }
+    .copy-button-wrapper button.action-button:hover { opacity: 1; }
+
+    #scrollToBottomBtn {
+      position: fixed; bottom: 30px; right: 30px; background-color: var(--primary-color);
+      color: white; border: none; border-radius: 50%; width: 45px; height: 45px;
+      font-size: 1.5em; cursor: pointer; opacity: 0.7; transition: opacity 0.3s, background-color 0.3s, transform 0.1s ease;
+      display: none; box-shadow: 0 2px 5px rgba(0,0,0,0.2); line-height: 45px; text-align: center;
+    }
+    #scrollToBottomBtn:hover { opacity: 1; background-color: var(--secondary-color); transform: translateY(-2px); }
+    #scrollToBottomBtn:active { transform: translateY(0px); }
+
+
+    .voice-status { margin-top: 15px; font-size: 0.9em; color: var(--text-muted-color); text-align: center; min-height: 1.2em; }
+    .flex-row { display: flex; gap: 15px; align-items: flex-end; margin-bottom: 15px; /* Add bottom margin to flex-row itself */ }
+    .flex-row > div { flex-grow: 1; }
+    /* Remove margin-bottom from direct children if flex-row itself has it */
+    .flex-row > div > input, .flex-row > div > select, .flex-row > div > textarea { margin-bottom: 0 !important; }
+    .flex-row > button { margin-bottom: 0; flex-shrink: 0; }
+
+
+    /* Settings Modal Styles */
+    .settings-modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--modal-overlay-bg);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+    .settings-modal-content {
+        background-color: var(--modal-bg);
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        width: 90%;
+        max-width: 600px;
+        position: relative;
+        border: 1px solid var(--history-border);
+    }
+    .settings-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--input-border);
+    }
+    .settings-modal-header h2 {
+        margin: 0;
+        color: var(--primary-color);
+        font-size: 1.5em;
+    }
+    #closeSettingsModalBtn {
+        background: none;
+        border: none;
+        font-size: 1.8em;
+        color: var(--accent-color);
+        cursor: pointer;
+        padding: 5px;
+        line-height: 1;
+    }
+    #closeSettingsModalBtn:hover {
+        color: var(--primary-color);
+    }
+    /* Ensure last element in modal doesn't have bottom margin */
+    .settings-modal-content .config-section > div:last-child > textarea,
+    .settings-modal-content .config-section > div:last-child > input,
+    .settings-modal-content .config-section > div:last-child > select {
+        margin-bottom: 0;
+    }
+    .settings-modal-content .flex-row:last-child {
+        margin-bottom: 0;
+    }
+
+  </style>
+</head>
+<body class="dark-theme">
+  <div class="container">
+    <h1 id="siteTitle">🤖 Asisten AI Peribadi</h1>
+
+    <div class="warning" id="warningText">
+      <strong>AMARAN KESELAMATAN:</strong> Jangan kongsikan fail atau link ini kerana ia mengandungi kod rahsia (API Key).
+    </div>
+    <div class="info-box" id="infoBoxText">
+      💡 Tips: Tekan <strong>Enter</strong> untuk hantar, <strong>Shift+Enter</strong> untuk baris baru. Gunakan butang mikrofon untuk input suara.
+    </div>
+
+    <div class="input-section">
+        <label for="promptInput" id="promptLabel">Pertanyaan Anda:</label>
+        <div class="input-wrapper">
+            <textarea id="promptInput" placeholder="Tulis pertanyaan atau arahan kau di sini..."></textarea>
+            <button id="clearInputBtn" title="Kosongkan Input">×</button>
+        </div>
+        <div class="button-group">
+          <button id="submitBtn">Hantar</button>
+          <button id="stopBtn" style="display: none;">Hentikan Permintaan</button>
+          <button id="voiceToggleBtn">🎤 Mulai Suara</button>
+        </div>
+        <p class="note">© A.H 5.1</p>
+        <div class="voice-status" id="voiceStatus"></div>
+    </div>
+
+    <div class="loading-indicator" id="loadingIndicator">
+      <div class="spinner"></div>
+      <span id="loadingText">Memproses permintaan...</span>
+    </div>
+
+    <div class="response-section">
+        <div id="responseArea">
+          <h2 id="responseTitle">Jawapan AI:</h2>
+          <div id="responseText">Jawapan akan dipaparkan di sini...</div>
+           <div class="button-group" style="margin-top: 15px; justify-content: flex-end;">
+               <button id="ttsBtn" style="display:none;">🔊 Bacakan</button>
+               <button id="stopSpeechBtn" style="display:none;">🔇 Henti Baca</button>
+               <button id="copyResponseBtn" class="action-button" style="display:none;">Salin Teks</button>
+           </div>
+        </div>
+    </div>
+
+    <div class="history-section">
+        <div id="historyArea">
+          <h2 id="historyTitle">Riwayat Perbualan:</h2>
+          <div id="historyContainer">
+            <p id="noHistoryMessage" style="text-align: center; color: var(--text-muted-color);">Tiada perbualan lagi.</p>
+          </div>
+        </div>
+        <div class="button-group" style="margin-top: 15px; justify-content: flex-end;">
+          <button id="clearHistoryBtn">Kosongkan Riwayat</button>
+          <button id="exportHistoryBtn">Eksport Riwayat</button>
+        </div>
+     </div>
+
+  </div>
+  
+  <div class="header-controls">
+      <button id="settingsBtn" title="Tetapan">⚙️</button>
+      <button id="themeToggleBtn" title="Tukar Tema">☀️</button>
+  </div>
+  <button id="scrollToBottomBtn" title="Gulir ke Bawah">⬇️</button>
+
+  <!-- Settings Modal -->
+  <div id="settingsModalOverlay" class="settings-modal-overlay">
+      <div class="settings-modal-content">
+          <div class="settings-modal-header">
+              <h2 id="settingsModalTitle">Tetapan Aplikasi</h2>
+              <button id="closeSettingsModalBtn" title="Tutup">×</button>
+          </div>
+          <div class="config-section">
+              <div class="flex-row">
+                  <div>
+                      <label for="modelSelect" id="modelSelectLabel">Model AI:</label>
+                      <select id="modelSelect">
+                        <option value="gemini-1.5-flash-latest">Gemini 1.5 Flash (Latest)</option>
+                        <option value="gemini-1.5-pro-latest">Gemini 1.5 Pro (Latest)</option>
+                        <option value="gemini-pro">Gemini Pro (Teks Sahaja)</option>
+                      </select>
+                  </div>
+                   <div>
+                      <label for="siteLangSelect" id="siteLangLabel">Bahasa Laman:</label>
+                      <select id="siteLangSelect">
+                        <option value="ms">Bahasa Melayu</option>
+                        <option value="id">Bahasa Indonesia</option>
+                        <option value="en">English</option>
+                      </select>
+                  </div>
+              </div>
+               <div>
+                  <label for="systemPromptInput" id="systemPromptLabel">Arahan Sistem (System Prompt):</label>
+                  <textarea id="systemPromptInput" placeholder="Contoh: Anda adalah pembantu AI yang mesra dan suka bergurau. Balas dalam Bahasa Melayu." rows="3"></textarea>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <script>
+    // API Key anda telah dimasukkan di sini:
+    const API_KEY = "AIzaSyDb5nVBjoyrpKykaWrHXPnmcWxq782zFAA"; // GANTIKAN DENGAN API KEY SEBENAR ANDA
+
+    // Settings & Storage Keys
+    const MODEL_STORAGE_KEY = 'aiAssistantModel';
+    const HISTORY_KEY = 'aiAssistantHistory';
+    const THEME_KEY = 'aiAssistantTheme';
+    const SYSTEM_PROMPT_KEY = 'aiAssistantSystemPrompt';
+    const LANG_KEY = 'aiAssistantLang';
+    const MAX_HISTORY_TURNS = 5; // Max pairs of user/model messages
+
+    // --- Terjemahan ---
+    const translations = {
+        ms: {
+            siteTitle: "🤖 Asisten AI Peribadi",
+            modelSelectLabel: "Model AI:",
+            siteLangLabel: "Bahasa Laman:",
+            systemPromptLabel: "Arahan Sistem (System Prompt):",
+            systemPromptPlaceholder: "Contoh: Anda adalah pembantu AI yang mesra dan suka bergurau. Balas dalam Bahasa Melayu.",
+            warningText: "AMARAN KESELAMATAN: Jangan kongsikan fail atau link ini kerana ia mengandungi kod rahsia (API Key).",
+            infoBoxText: "💡 Tips: Tekan Enter untuk hantar, Shift+Enter untuk baris baru. Gunakan butang mikrofon untuk input suara.",
+            promptLabel: "Pertanyaan Anda:",
+            promptPlaceholder: "Tulis pertanyaan atau arahan kau di sini...",
+            submitBtn: "Hantar",
+            stopBtn: "Hentikan Permintaan",
+            voiceToggleBtn: "🎤 Mulai Suara",
+            voiceStopBtn: "🛑 Hentikan Suara",
+            voiceListening: "Sedang mendengar...",
+            voiceSuccess: "Suara berjaya ditangkap!",
+            voiceError: "Terdapat ralat dalam pengenalan suara.",
+            voiceEnd: "Pengenalan suara berhenti.",
+            voiceNotSupported: "Fungsi pengenalan suara tidak disokong browser kau.",
+            loadingText: "Memproses permintaan...",
+            responseTitle: "Jawapan AI:",
+            responseInitial: "Jawapan akan dipaparkan di sini...",
+            ttsBtn: "🔊 Bacakan",
+            stopSpeechBtn: "🔇 Henti Baca",
+            copyResponseBtn: "Salin Teks",
+            historyTitle: "Riwayat Perbualan:",
+            noHistory: "Tiada perbualan lagi.",
+            clearHistoryBtn: "Kosongkan Riwayat",
+            exportHistoryBtn: "Eksport Riwayat",
+            confirmClearHistory: "Yakin nak kosongkan riwayat?",
+            noHistoryToExport: "Tiada riwayat untuk dieksport.",
+            themeToggleLight: "☀️ Terang",
+            themeToggleDark: "🌙 Gelap",
+            settingsBtnTitle: "Tetapan",
+            settingsModalTitle: "Tetapan Aplikasi",
+            closeSettingsModalTitle: "Tutup",
+            copiedSuccess: "Disalin!",
+            copiedFail: "Gagal Salin",
+            errorPrefix: "Ralat:",
+            errorNoInternet: "Tiada sambungan internet.",
+            errorApiFailed: "Gagal hubungi API. Periksa API Key dalam kod & sambungan internet.",
+            errorBlocked: "Permintaan diblokir:",
+            errorSafetyRatings: "Rating Keselamatan:",
+            errorApiGeneral: "Error dari API:",
+            errorUnknownStructure: "Gagal parse respons AI. Struktur tidak dikenal.",
+            errorRequestCancelled: "Permintaan dibatalkan.",
+            promptRequired: "Sila masukkan pertanyaan dulu.",
+            clearInputBtn: "Kosongkan Input",
+            historyUser: "Anda",
+            historyAI: "AI"
+      },
+      id: {
+        siteTitle: "🤖 Asisten AI Pribadi",
+        modelSelectLabel: "Model AI:",
+        siteLangLabel: "Bahasa Situs:",
+        systemPromptLabel: "Instruksi Sistem (System Prompt):",
+        systemPromptPlaceholder: "Contoh: Anda adalah asisten AI yang ramah dan suka bercanda. Balas dalam Bahasa Indonesia.",
+        warningText: "PERINGATAN KEAMANAN: Jangan bagikan file atau tautan ini karena berisi kode rahsia (API Key).",
+        infoBoxText: "💡 Tips: Tekan Enter untuk kirim, Shift+Enter untuk baris baru. Gunakan tombol mikrofon untuk input suara.",
+        promptLabel: "Pertanyaan Anda:",
+        promptPlaceholder: "Tulis pertanyaan atau perintah kamu di sini...",
+        submitBtn: "Kirim",
+        stopBtn: "Hentikan Permintaan",
+        voiceToggleBtn: "🎤 Mulai Suara",
+        voiceStopBtn: "🛑 Hentikan Suara",
+        voiceListening: "Sedang mendengarkan...",
+        voiceSuccess: "Suara berhasil ditangkap!",
+        voiceError: "Terjadi galat dalam pengenalan suara.",
+        voiceEnd: "Pengenalan suara berhenti.",
+        voiceNotSupported: "Fitur pengenalan suara tidak didukung browser Anda.",
+        loadingText: "Memproses permintaan...",
+        responseTitle: "Jawaban AI:",
+        responseInitial: "Jawaban akan ditampilkan di sini...",
+        ttsBtn: "🔊 Bacakan",
+        stopSpeechBtn: "🔇 Henti Baca",
+        copyResponseBtn: "Salin Teks",
+        historyTitle: "Riwayat Percakapan:",
+        noHistory: "Belum ada percakapan.",
+        clearHistoryBtn: "Kosongkan Riwayat",
+        exportHistoryBtn: "Ekspor Riwayat",
+        confirmClearHistory: "Yakin ingin mengosongkan riwayat?",
+        noHistoryToExport: "Tidak ada riwayat untuk diekspor.",
+        themeToggleLight: "☀️ Terang",
+        themeToggleDark: "🌙 Gelap",
+        settingsBtnTitle: "Pengaturan",
+        settingsModalTitle: "Pengaturan Aplikasi",
+        closeSettingsModalTitle: "Tutup",
+        copiedSuccess: "Disalin!",
+        copiedFail: "Gagal Salin",
+        errorPrefix: "Galat:",
+        errorNoInternet: "Tidak ada koneksi internet.",
+        errorApiFailed: "Gagal menghubungi API. Periksa API Key dalam kode & koneksi internet.",
+        errorBlocked: "Permintaan diblokir:",
+        errorSafetyRatings: "Peringkat Keamanan:",
+        errorApiGeneral: "Galat dari API:",
+        errorUnknownStructure: "Gagal mem-parse respons AI. Struktur tidak dikenal.",
+        errorRequestCancelled: "Permintaan dibatalkan.",
+        promptRequired: "Silakan masukkan pertanyaan dulu.",
+        clearInputBtn: "Kosongkan Input",
+        historyUser: "Anda",
+        historyAI: "AI"
+      },
+       en: {
+        siteTitle: "🤖 Personal AI Assistant",
+        modelSelectLabel: "AI Model:",
+        siteLangLabel: "Site Language:",
+        systemPromptLabel: "System Prompt:",
+        systemPromptPlaceholder: "Example: You are a friendly and witty AI assistant. Respond in English.",
+        warningText: "SECURITY WARNING: Do not share this file or link as it contains a secret code (API Key).",
+        infoBoxText: "💡 Tips: Press Enter to send, Shift+Enter for a new line. Use the microphone button for voice input.",
+        promptLabel: "Your Query:",
+        promptPlaceholder: "Type your question or command here...",
+        submitBtn: "Send",
+        stopBtn: "Stop Request",
+        voiceToggleBtn: "🎤 Start Voice",
+        voiceStopBtn: "🛑 Stop Voice",
+        voiceListening: "Listening...",
+        voiceSuccess: "Voice captured successfully!",
+        voiceError: "There was an error in voice recognition.",
+        voiceEnd: "Voice recognition stopped.",
+        voiceNotSupported: "Voice recognition is not supported by your browser.",
+        loadingText: "Processing request...",
+        responseTitle: "AI Answer:",
+        responseInitial: "Answer will be displayed here...",
+        ttsBtn: "🔊 Read Aloud",
+        stopSpeechBtn: "🔇 Stop Reading",
+        copyResponseBtn: "Copy Text",
+        historyTitle: "Conversation History:",
+        noHistory: "No conversation yet.",
+        clearHistoryBtn: "Clear History",
+        exportHistoryBtn: "Export History",
+        confirmClearHistory: "Are you sure you want to clear the history?",
+        noHistoryToExport: "No history to export.",
+        themeToggleLight: "☀️ Light",
+        themeToggleDark: "🌙 Dark",
+        settingsBtnTitle: "Settings",
+        settingsModalTitle: "Application Settings",
+        closeSettingsModalTitle: "Close",
+        copiedSuccess: "Copied!",
+        copiedFail: "Copy Failed",
+        errorPrefix: "Error:",
+        errorNoInternet: "No internet connection.",
+        errorApiFailed: "Failed to contact API. Check the API Key in the code & internet connection.",
+        errorBlocked: "Request blocked:",
+        errorSafetyRatings: "Safety Ratings:",
+        errorApiGeneral: "Error from API:",
+        errorUnknownStructure: "Failed to parse AI response. Unknown structure.",
+        errorRequestCancelled: "Request cancelled.",
+        promptRequired: "Please enter a query first.",
+        clearInputBtn: "Clear Input",
+        historyUser: "You",
+        historyAI: "AI"
+      }
+    };
+
+    // --- Elemen DOM ---
+    const siteTitle = document.getElementById('siteTitle');
+    const modelSelectLabel = document.getElementById('modelSelectLabel');
+    const modelSelect = document.getElementById('modelSelect');
+    const siteLangLabel = document.getElementById('siteLangLabel');
+    const siteLangSelect = document.getElementById('siteLangSelect');
+    const systemPromptLabel = document.getElementById('systemPromptLabel');
+    const systemPromptInput = document.getElementById('systemPromptInput');
+    const warningText = document.getElementById('warningText');
+    const infoBoxText = document.getElementById('infoBoxText');
+    const promptLabel = document.getElementById('promptLabel');
+    const promptInput = document.getElementById('promptInput');
+    const clearInputBtn = document.getElementById('clearInputBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const voiceToggleBtn = document.getElementById('voiceToggleBtn');
+    const voiceStatus = document.getElementById('voiceStatus');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const loadingText = document.getElementById('loadingText');
+    //const responseArea = document.getElementById('responseArea'); // Not directly used for text update
+    const responseTitle = document.getElementById('responseTitle');
+    const responseTextDiv = document.getElementById('responseText');
+    const ttsBtn = document.getElementById('ttsBtn');
+    const stopSpeechBtn = document.getElementById('stopSpeechBtn');
+    const copyResponseBtn = document.getElementById('copyResponseBtn');
+    //const historyArea = document.getElementById('historyArea'); // Not directly used for text update
+    const historyTitle = document.getElementById('historyTitle');
+    const historyContainer = document.getElementById('historyContainer');
+    const noHistoryMessage = document.getElementById('noHistoryMessage');
+    const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+    const exportHistoryBtn = document.getElementById('exportHistoryBtn');
+    const scrollToBottomBtn = document.getElementById('scrollToBottomBtn');
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    const body = document.body;
+    const hljsTheme = document.getElementById('hljs-theme');
+
+    // Settings Modal Elements
+    const settingsBtn = document.getElementById('settingsBtn');
+    const settingsModalOverlay = document.getElementById('settingsModalOverlay');
+    const settingsModalTitle = document.getElementById('settingsModalTitle');
+    const closeSettingsModalBtn = document.getElementById('closeSettingsModalBtn');
+
+
+    // --- State Variables ---
+    let conversationHistory = [];
+    let currentAbortController = null;
+    let currentTheme = localStorage.getItem(THEME_KEY) || 'dark-theme';
+    let recognition, isVoiceActive = false;
+    let currentSiteLang = localStorage.getItem(LANG_KEY) || 'ms';
+    let currentModel = localStorage.getItem(MODEL_STORAGE_KEY) || 'gemini-1.5-flash-latest';
+    let currentSystemPrompt = localStorage.getItem(SYSTEM_PROMPT_KEY) || '';
+    let lastResponseText = '';
+
+    // --- Initialization ---
+    function initializeApp() {
+        siteLangSelect.value = currentSiteLang;
+        modelSelect.value = currentModel;
+        systemPromptInput.value = currentSystemPrompt;
+        body.className = currentTheme; // Ensure this is set before updateLanguage for theme button text
+        
+        // Set root primary color RGB for dynamic focus outline
+        const rootStyle = getComputedStyle(document.documentElement);
+        const primaryColor = rootStyle.getPropertyValue('--primary-color').trim();
+        if (primaryColor.startsWith('#')) {
+            const r = parseInt(primaryColor.slice(1, 3), 16);
+            const g = parseInt(primaryColor.slice(3, 5), 16);
+            const b = parseInt(primaryColor.slice(5, 7), 16);
+            document.documentElement.style.setProperty('--primary-color-rgb', `${r},${g},${b}`);
+        }
+
+
+        updateLanguage(currentSiteLang); // This will also call updateTheme
+        loadHistory();
+        // updateTheme is called within updateLanguage, so no need to call it separately here
+        // if it's not, ensure it's called: updateTheme(currentTheme); 
+
+        if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+            initVoiceRecognition();
+        } else {
+            voiceToggleBtn.disabled = true;
+            // voiceStatus message set in updateLanguage
+        }
+        promptInput.focus();
+    }
+
+    // --- Language Functions ---
+    function updateLanguage(lang) {
+      currentSiteLang = lang;
+      localStorage.setItem(LANG_KEY, lang);
+      const t = translations[lang];
+
+      siteTitle.textContent = t.siteTitle;
+      modelSelectLabel.textContent = t.modelSelectLabel;
+      siteLangLabel.textContent = t.siteLangLabel;
+      systemPromptLabel.textContent = t.systemPromptLabel;
+      systemPromptInput.placeholder = t.systemPromptPlaceholder;
+      if(t.warningText.includes(":")){
+          warningText.innerHTML = `<strong>${t.warningText.split(":")[0]}:</strong> ${t.warningText.split(":")[1]}`;
+      } else {
+          warningText.textContent = t.warningText;
+      }
+      warningText.style.display = 'block'; // Ensure it's visible
+      infoBoxText.innerHTML = t.infoBoxText;
+      promptLabel.textContent = t.promptLabel;
+      promptInput.placeholder = t.promptPlaceholder;
+      submitBtn.textContent = t.submitBtn;
+      stopBtn.textContent = t.stopBtn;
+      voiceToggleBtn.textContent = isVoiceActive ? t.voiceStopBtn : t.voiceToggleBtn;
+      loadingText.textContent = t.loadingText;
+      responseTitle.textContent = t.responseTitle;
+      if (responseTextDiv.textContent === translations.ms.responseInitial ||
+          responseTextDiv.textContent === translations.id.responseInitial ||
+          responseTextDiv.textContent === translations.en.responseInitial ||
+          responseTextDiv.textContent.trim() === '' || responseTextDiv.innerHTML.includes(translations.ms.responseInitial) ||
+          responseTextDiv.innerHTML.includes(translations.id.responseInitial) || responseTextDiv.innerHTML.includes(translations.en.responseInitial)
+          ) {
+             responseTextDiv.textContent = t.responseInitial;
+      }
+      ttsBtn.textContent = t.ttsBtn;
+      stopSpeechBtn.textContent = t.stopSpeechBtn;
+      copyResponseBtn.textContent = t.copyResponseBtn;
+      historyTitle.textContent = t.historyTitle;
+      noHistoryMessage.textContent = t.noHistory;
+      clearHistoryBtn.textContent = t.clearHistoryBtn;
+      exportHistoryBtn.textContent = t.exportHistoryBtn;
+      clearInputBtn.title = t.clearInputBtn;
+
+      // Update theme button text based on current theme
+      themeToggleBtn.title = body.classList.contains("light-theme") ? t.themeToggleDark : t.themeToggleLight;
+      themeToggleBtn.innerHTML = body.classList.contains("light-theme") ? '🌙' : '☀️';
+
+
+      // Settings Modal related texts
+      settingsBtn.title = t.settingsBtnTitle;
+      settingsModalTitle.textContent = t.settingsModalTitle;
+      closeSettingsModalBtn.title = t.closeSettingsModalTitle;
+
+
+      if (recognition) { recognition.lang = getTTSLang(lang); }
+      if (voiceToggleBtn.disabled) { voiceStatus.textContent = t.voiceNotSupported; }
+      else if (!isVoiceActive && voiceStatus.textContent !== ''){ voiceStatus.textContent = ''; }
+
+      renderHistory(); // Re-render history to update "You" and "AI" labels
+      updateTheme(currentTheme, true); // Pass a flag to prevent infinite loop if updateTheme also calls updateLanguage
+    }
+    siteLangSelect.addEventListener('change', (e) => { updateLanguage(e.target.value); });
+
+    // --- Theme Management ---
+    function updateTheme(theme, calledFromUpdateLanguage = false) {
+        const t = translations[currentSiteLang]; // Get translations for current language
+        body.className = theme;
+        currentTheme = theme;
+        localStorage.setItem(THEME_KEY, theme);
+        const isLight = theme === 'light-theme';
+
+        // Update theme button content based on current theme and language
+        themeToggleBtn.title = isLight ? t.themeToggleDark : t.themeToggleLight;
+        themeToggleBtn.innerHTML = isLight ? '🌙' : '☀️';
+
+        hljsTheme.href = isLight ? "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css"
+                                 : "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css";
+        
+        // Update primary color RGB variable for focus outline
+        const rootStyle = getComputedStyle(document.documentElement);
+        const primaryColor = rootStyle.getPropertyValue('--primary-color').trim();
+        if (primaryColor.startsWith('#')) {
+            const r = parseInt(primaryColor.slice(1, 3), 16);
+            const g = parseInt(primaryColor.slice(3, 5), 16);
+            const b = parseInt(primaryColor.slice(5, 7), 16);
+            document.documentElement.style.setProperty('--primary-color-rgb', `${r},${g},${b}`);
+        }
+
+        // If updateTheme is part of a language change, we don't want to call updateLanguage again
+        if (!calledFromUpdateLanguage) {
+            // updateLanguage(currentSiteLang); // This might be too much, only update specific elements if needed
+        }
+    }
+    themeToggleBtn.addEventListener('click', () => {
+        const newTheme = body.classList.contains("light-theme") ? "dark-theme" : "light-theme";
+        updateTheme(newTheme);
+    });
+
+    // --- Settings Modal ---
+    function openSettingsModal() {
+        settingsModalOverlay.style.display = 'flex';
+    }
+    function closeSettingsModal() {
+        settingsModalOverlay.style.display = 'none';
+    }
+    settingsBtn.addEventListener('click', openSettingsModal);
+    closeSettingsModalBtn.addEventListener('click', closeSettingsModal);
+    settingsModalOverlay.addEventListener('click', (event) => { // Close if clicked on overlay
+        if (event.target === settingsModalOverlay) {
+            closeSettingsModal();
+        }
+    });
+
+
+    // --- Model & System Prompt Management ---
+    modelSelect.addEventListener('change', (e) => { currentModel = e.target.value; localStorage.setItem(MODEL_STORAGE_KEY, currentModel); });
+    systemPromptInput.addEventListener('input', (e) => { currentSystemPrompt = e.target.value.trim(); localStorage.setItem(SYSTEM_PROMPT_KEY, currentSystemPrompt); });
+
+    // --- Input Management ---
+    promptInput.addEventListener('input', () => { clearInputBtn.style.display = promptInput.value ? 'block' : 'none'; });
+    clearInputBtn.addEventListener('click', () => { promptInput.value = ''; clearInputBtn.style.display = 'none'; promptInput.focus(); });
+
+    // --- History Management ---
+    function loadHistory() {
+         const storedHistory = localStorage.getItem(HISTORY_KEY);
+      if (storedHistory) {
+        try { conversationHistory = JSON.parse(storedHistory); }
+        catch (e) { console.error("Gagal memuat riwayat:", e); localStorage.removeItem(HISTORY_KEY); conversationHistory = []; }
+      } renderHistory();
+    }
+    function saveHistory() { localStorage.setItem(HISTORY_KEY, JSON.stringify(conversationHistory)); }
+    function addToHistory(userPrompt, aiResponse) {
+        conversationHistory.push({ role: 'user', text: userPrompt });
+        conversationHistory.push({ role: 'model', text: aiResponse });
+        // Limit history to avoid excessive storage and API context window issues
+        if (conversationHistory.length > MAX_HISTORY_TURNS * 2 * 2) { // Keep a bit more than sent to API
+            conversationHistory.splice(0, conversationHistory.length - (MAX_HISTORY_TURNS * 2 * 2));
+        }
+        saveHistory();
+        renderHistory();
+    }
+    function renderHistory() {
+       const t = translations[currentSiteLang];
+      historyContainer.innerHTML = '';
+      if (conversationHistory.length === 0) {
+        noHistoryMessage.style.display = 'block';
+        scrollToBottomBtn.style.display = 'none'; return;
+      }
+      noHistoryMessage.style.display = 'none';
+      let visibleHistoryItems = 0;
+      conversationHistory.forEach((item, index) => {
+        if (item.role === 'user' || item.role === 'model') { // Only render user and model roles
+             const historyItemDiv = document.createElement('div'); historyItemDiv.className = 'history-item';
+             const roleLabel = document.createElement('div'); roleLabel.className = item.role === 'user' ? 'user-prompt' : 'ai-response-label';
+             roleLabel.textContent = item.role === 'user' ? `${t.historyUser}:` : `${t.historyAI}:`;
+             const contentDiv = document.createElement('div'); contentDiv.className = item.role === 'user' ? 'user-content' : 'ai-response';
+             if (item.role === 'model' && item.text) {
+                 contentDiv.innerHTML = marked.parse(item.text);
+                 addCopyButton(historyItemDiv, item.text, true);
+             }
+             else { contentDiv.textContent = item.text; }
+             historyItemDiv.appendChild(roleLabel); historyItemDiv.appendChild(contentDiv); historyContainer.appendChild(historyItemDiv);
+             visibleHistoryItems++;
+         } else {
+             console.warn("Skipping history item with unknown role:", item);
+         }
+      });
+      historyContainer.querySelectorAll('pre code').forEach((block) => { hljs.highlightElement(block); });
+      historyContainer.scrollTop = historyContainer.scrollHeight;
+      // Show scroll to bottom if content overflows AND there are more than a few items
+      const isOverflowing = historyContainer.scrollHeight > historyContainer.clientHeight;
+      scrollToBottomBtn.style.display = isOverflowing && visibleHistoryItems > 3 ? 'block' : 'none';
+    }
+    clearHistoryBtn.addEventListener('click', () => {
+        if (confirm(translations[currentSiteLang].confirmClearHistory)) {
+            conversationHistory = []; saveHistory(); renderHistory();
+            responseTextDiv.innerHTML = translations[currentSiteLang].responseInitial;
+            lastResponseText = '';
+            ttsBtn.style.display = 'none'; stopSpeechBtn.style.display = 'none'; copyResponseBtn.style.display = 'none';
+        }
+    });
+    exportHistoryBtn.addEventListener('click', () => {
+         if (conversationHistory.length === 0) { alert(translations[currentSiteLang].noHistoryToExport); return; }
+        let exportText = ""; const t = translations[currentSiteLang];
+        conversationHistory.forEach(item => {
+            if (item.role === 'user' || item.role === 'model') { // Only export user and model roles
+                const role = item.role === 'user' ? t.historyUser : t.historyAI;
+                exportText += `${role}:\n${item.text}\n\n---\n\n`;
+            }
+        });
+        const blob = new Blob([exportText], { type: 'text/plain;charset=utf-8' }); const url = URL.createObjectURL(blob);
+        const downloadAnchor = document.createElement("a"); downloadAnchor.setAttribute("href", url); downloadAnchor.setAttribute("download", `riwayat_ai_${new Date().toISOString().slice(0,10)}.txt`);
+        document.body.appendChild(downloadAnchor); downloadAnchor.click(); document.body.removeChild(downloadAnchor); URL.revokeObjectURL(url);
+    });
+
+    // --- Copy Button Logic ---
+    function addCopyButton(targetElement, textToCopy, isHistory = false) {
+         let existingWrapper = targetElement.querySelector('.copy-button-wrapper'); if(existingWrapper) { existingWrapper.remove(); }
+      const wrapper = document.createElement('div'); wrapper.className = 'copy-button-wrapper';
+      const button = document.createElement('button'); const t = translations[currentSiteLang]; button.textContent = t.copyResponseBtn;
+      button.className = 'action-button copy-history-btn'; // action-button class for styling
+      button.onclick = (e) => {
+        e.stopPropagation(); navigator.clipboard.writeText(textToCopy)
+          .then(() => { const originalText = button.textContent; button.textContent = t.copiedSuccess; button.disabled = true; setTimeout(() => { button.textContent = originalText; button.disabled = false; }, 2000); })
+          .catch(err => { console.error('Gagal menyalin:', err); const originalText = button.textContent; button.textContent = t.copiedFail; setTimeout(() => { button.textContent = originalText; }, 2000); });
+      }; wrapper.appendChild(button); if (isHistory) { targetElement.prepend(wrapper); }
+    }
+
+     // --- Main Response Area Buttons ---
+     copyResponseBtn.addEventListener('click', () => {
+        if (lastResponseText) { const t = translations[currentSiteLang]; navigator.clipboard.writeText(lastResponseText)
+            .then(() => { const originalText = copyResponseBtn.textContent; copyResponseBtn.textContent = t.copiedSuccess; copyResponseBtn.disabled = true; setTimeout(() => { copyResponseBtn.textContent = originalText; copyResponseBtn.disabled = false; }, 2000); })
+            .catch(err => { console.error('Gagal menyalin:', err); const originalText = copyResponseBtn.textContent; copyResponseBtn.textContent = t.copiedFail; setTimeout(() => { copyResponseBtn.textContent = originalText; }, 2000); }); }
+    });
+
+    // --- Text-to-Speech (TTS) ---
+    function getTTSLang(siteLang) { if (siteLang === 'ms') return 'ms-MY'; if (siteLang === 'id') return 'id-ID'; return 'en-US'; }
+    function speakText(text) {
+         stopSpeaking(); if ('speechSynthesis' in window && text) {
+            const plainText = text.replace(/```[\s\S]*?```/g, ' kod program. ').replace(/`([^`]+)`/g, '$1').replace(/(\*|_){1,2}([^*_]+)\1{1,2}/g, '$2').replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1').replace(/#+\s/g, '');
+            const utterance = new SpeechSynthesisUtterance(plainText); utterance.lang = getTTSLang(currentSiteLang); utterance.rate = 1.0; utterance.pitch = 1.0;
+            utterance.onstart = () => { stopSpeechBtn.style.display = 'inline-block'; ttsBtn.disabled = true; }; utterance.onend = () => { stopSpeechBtn.style.display = 'none'; ttsBtn.disabled = false; };
+            utterance.onerror = (event) => { console.error("Speech synthesis error:", event); stopSpeechBtn.style.display = 'none'; ttsBtn.disabled = false; };
+            window.speechSynthesis.speak(utterance); } else if (!text) { console.warn("TTS: Tiada teks untuk dibaca."); } else { console.warn("TTS: Speech Synthesis tidak disokong."); }
+    }
+    function stopSpeaking() { if ('speechSynthesis' in window && window.speechSynthesis.speaking) { window.speechSynthesis.cancel(); } stopSpeechBtn.style.display = 'none'; ttsBtn.disabled = false; }
+    ttsBtn.addEventListener('click', () => { if (lastResponseText) { speakText(lastResponseText); } });
+    stopSpeechBtn.addEventListener('click', () => { stopSpeaking(); });
+
+    // --- Voice Recognition ---
+    function initVoiceRecognition() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; if (!SpeechRecognition) { voiceToggleBtn.disabled = true; /* message set in updateLanguage */ return; }
+        recognition = new SpeechRecognition(); recognition.lang = getTTSLang(currentSiteLang); recognition.continuous = false; recognition.interimResults = false;
+        recognition.onstart = () => { isVoiceActive = true; const t = translations[currentSiteLang]; voiceStatus.textContent = t.voiceListening; voiceToggleBtn.textContent = t.voiceStopBtn; voiceToggleBtn.style.backgroundColor = 'var(--button-danger-bg)'; };
+        recognition.onresult = (event) => { const transcript = event.results[0][0].transcript; promptInput.value = transcript; const t = translations[currentSiteLang]; voiceStatus.textContent = t.voiceSuccess; clearInputBtn.style.display = 'block'; setTimeout(() => { voiceStatus.textContent = ''; }, 3000); };
+        recognition.onerror = (event) => { console.error("Error voice recognition", event.error); const t = translations[currentSiteLang]; if (event.error === 'no-speech' || event.error === 'audio-capture' || event.error === 'not-allowed') { voiceStatus.textContent = `${t.voiceError} (${event.error})`; } else { voiceStatus.textContent = t.voiceError; } setTimeout(() => { if(isVoiceActive) voiceStatus.textContent = ''; }, 5000); };
+        recognition.onend = () => { isVoiceActive = false; const t = translations[currentSiteLang]; if (!voiceStatus.textContent.includes(t.voiceSuccess)) { voiceStatus.textContent = t.voiceEnd; setTimeout(() => { voiceStatus.textContent = ''; }, 3000); } voiceToggleBtn.textContent = t.voiceToggleBtn; voiceToggleBtn.style.backgroundColor = ''; };
+    }
+    voiceToggleBtn.addEventListener('click', () => {
+        if (!recognition) return; if (isVoiceActive) { recognition.stop(); } else { const t = translations[currentSiteLang]; navigator.mediaDevices.getUserMedia({ audio: true }) .then(() => { recognition.start(); }) .catch(err => { console.error("Microphone access denied or error:", err); voiceStatus.textContent = `${t.voiceError} (Mic access: ${err.name})`; setTimeout(() => { voiceStatus.textContent = ''; }, 5000); }); }
+    });
+
+    // --- Core API Call Function ---
+    async function askGoogleAI(prompt) {
+         const t = translations[currentSiteLang];
+        if (!API_KEY || !API_KEY.startsWith('AIza')) {
+            const errorMsg = "API Key tidak sah atau belum dimasukkan dengan betul dalam kod JavaScript (const API_KEY).";
+            console.error(errorMsg);
+            displayError(`${t.errorPrefix} ${errorMsg}`);
+            return;
+        }
+
+        loadingIndicator.style.display = 'flex';
+        responseTextDiv.innerHTML = `<p>${t.loadingText}</p>`;
+        lastResponseText = '';
+        ttsBtn.style.display = 'none'; stopSpeechBtn.style.display = 'none'; copyResponseBtn.style.display = 'none';
+        submitBtn.disabled = true; promptInput.disabled = true; clearInputBtn.style.display = 'none'; stopBtn.style.display = 'inline-block';
+        modelSelect.disabled = true; siteLangSelect.disabled = true; systemPromptInput.disabled = true;
+        clearHistoryBtn.disabled = true; exportHistoryBtn.disabled = true;
+        themeToggleBtn.disabled = true; settingsBtn.disabled = true; voiceToggleBtn.disabled = true;
+
+        currentAbortController = new AbortController(); const signal = currentAbortController.signal;
+
+        if (!navigator.onLine) { displayError(t.errorNoInternet); resetUI(); return; }
+
+        let apiContents = [];
+        // Get last N turns of history, ensuring pairs
+        const historyToSend = conversationHistory.slice(-MAX_HISTORY_TURNS * 2);
+        historyToSend.forEach(item => {
+            if((item.role === 'user' || item.role === 'model') && item.text){
+                apiContents.push({ role: item.role, parts: [{ text: item.text }] });
+            }
+        });
+        apiContents.push({ role: 'user', parts: [{ text: prompt }] });
+
+        const requestBody = { contents: apiContents };
+        if (currentSystemPrompt) {
+            requestBody.systemInstruction = { parts: [{ text: currentSystemPrompt }] };
+        }
+
+        const selectedModel = modelSelect.value;
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${API_KEY}`;
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestBody),
+                signal: signal
+            });
+            currentAbortController = null; // Request completed or failed, clear controller
+
+            if (!response.ok) {
+                let errorBody = "No further details.";
+                try { const errorData = await response.json(); errorBody = JSON.stringify(errorData.error || errorData); }
+                catch (parseError) { errorBody = await response.text(); }
+                throw new Error(`HTTP Error: ${response.status} ${response.statusText}. Details: ${errorBody}`);
+            }
+            const data = await response.json();
+
+            if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+                lastResponseText = data.candidates[0].content.parts[0].text;
+                responseTextDiv.innerHTML = marked.parse(lastResponseText);
+                responseTextDiv.querySelectorAll('pre code').forEach((block) => { hljs.highlightElement(block); });
+                addToHistory(prompt, lastResponseText);
+                ttsBtn.style.display = 'inline-block';
+                copyResponseBtn.style.display = 'inline-block';
+            } else if (data.promptFeedback && data.promptFeedback.blockReason) {
+                let msg = `${t.errorBlocked} ${data.promptFeedback.blockReason}`;
+                if (data.promptFeedback.safetyRatings) { msg += `\n${t.errorSafetyRatings} ${JSON.stringify(data.promptFeedback.safetyRatings)}`; }
+                displayError(msg); lastResponseText = '';
+            } else if (data.error) {
+                let msg = `${t.errorApiGeneral} ${JSON.stringify(data.error.message || data.error)}`;
+                displayError(msg); lastResponseText = '';
+            } else {
+                console.error("Struktur respons tidak dikenal:", data);
+                displayError(t.errorUnknownStructure); lastResponseText = '';
+            }
+        } catch (error) {
+            currentAbortController = null; // Clear controller on error too
+            if (error.name === 'AbortError') {
+                console.log("Permintaan dibatalkan oleh pengguna.");
+                responseTextDiv.innerHTML = `<p style="color: var(--text-muted-color);">${t.errorRequestCancelled}</p>`;
+                lastResponseText = '';
+            }
+            else {
+                console.error("Ralat berlaku semasa panggilan API:", error);
+                lastResponseText = '';
+                if (error instanceof TypeError && error.message.toLowerCase().includes("failed to fetch")) {
+                    displayError(t.errorApiFailed);
+                } else {
+                    displayError(`${t.errorPrefix} ${error.message}`);
+                }
+            }
+        } finally {
+            resetUI();
+        }
+    }
+
+    // --- Helper Functions ---
+    function displayError(message) {
+        responseTextDiv.innerHTML = `<div style="color: var(--error-text); background-color: var(--error-bg); border: 1px solid var(--error-border); padding: 10px; border-radius: 5px; white-space: pre-wrap;">${message}</div>`;
+        lastResponseText = '';
+        ttsBtn.style.display = 'none'; stopSpeechBtn.style.display = 'none'; copyResponseBtn.style.display = 'none';
+    }
+    function resetUI() {
+        loadingIndicator.style.display = "none";
+        submitBtn.disabled = false; promptInput.disabled = false;
+        clearInputBtn.style.display = promptInput.value ? 'block' : 'none';
+        stopBtn.style.display = "none";
+        modelSelect.disabled = false; siteLangSelect.disabled = false; systemPromptInput.disabled = false;
+        clearHistoryBtn.disabled = false; exportHistoryBtn.disabled = false;
+        themeToggleBtn.disabled = false; settingsBtn.disabled = false;
+        if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) { voiceToggleBtn.disabled = false; }
+        promptInput.focus();
+    }
+
+    // --- Event Listeners ---
+    submitBtn.addEventListener('click', () => {
+        const userPrompt = promptInput.value.trim();
+        if (userPrompt) {
+            stopSpeaking(); // Stop any ongoing TTS
+            askGoogleAI(userPrompt);
+            promptInput.value = "";
+            clearInputBtn.style.display = 'none';
+        } else {
+            alert(translations[currentSiteLang].promptRequired);
+        }
+    });
+    stopBtn.addEventListener('click', () => {
+        if (currentAbortController) {
+            currentAbortController.abort();
+        }
+    });
+    promptInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" && !event.shiftKey) {
+            event.preventDefault();
+            if (!submitBtn.disabled) {
+                submitBtn.click();
+            }
+        }
+    });
+
+    historyContainer.addEventListener("scroll", () => {
+      const isScrolledToBottom = historyContainer.scrollHeight - historyContainer.scrollTop <= historyContainer.clientHeight + 30;
+      const isOverflowing = historyContainer.scrollHeight > historyContainer.clientHeight;
+      scrollToBottomBtn.style.display = !isScrolledToBottom && isOverflowing && conversationHistory.length > 3 ? "block" : "none";
+    });
+    scrollToBottomBtn.addEventListener("click", () => {
+      historyContainer.scrollTo({ top: historyContainer.scrollHeight, behavior: 'smooth' });
+    });
+
+    // --- Initial Load ---
+    document.addEventListener("DOMContentLoaded", initializeApp);
+
+  </script>
+</body>
+</html>
